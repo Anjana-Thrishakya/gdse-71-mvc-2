@@ -109,6 +109,11 @@ public class CustomerPanel extends javax.swing.JPanel {
 
         btnSave.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnSave.setText("Save");
+        btnSave.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                btnSaveActionPerformed(evt);
+            }
+        });
 
         btnUpdate.setFont(new java.awt.Font("Segoe UI", 1, 18)); // NOI18N
         btnUpdate.setText("Update");
@@ -127,6 +132,11 @@ public class CustomerPanel extends javax.swing.JPanel {
                 "Title 1", "Title 2", "Title 3", "Title 4"
             }
         ));
+        tblCustomer.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mouseClicked(java.awt.event.MouseEvent evt) {
+                tblCustomerMouseClicked(evt);
+            }
+        });
         jScrollPane1.setViewportView(tblCustomer);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
@@ -232,6 +242,14 @@ public class CustomerPanel extends javax.swing.JPanel {
         );
     }// </editor-fold>//GEN-END:initComponents
 
+    private void btnSaveActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_btnSaveActionPerformed
+        saveCustomer();
+    }//GEN-LAST:event_btnSaveActionPerformed
+
+    private void tblCustomerMouseClicked(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_tblCustomerMouseClicked
+        searchCustomer();
+    }//GEN-LAST:event_tblCustomerMouseClicked
+
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton btnDelete;
@@ -281,5 +299,58 @@ public class CustomerPanel extends javax.swing.JPanel {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
         
+    }
+
+    private void saveCustomer() {
+        CustomerDto customerDto = new CustomerDto(txtId.getText(),
+                txtTitle.getText(), txtName.getText(),
+                txtDob.getText(), Double.parseDouble(txtSalary.getText()),
+                txtAddress.getText(),
+                txtCity.getText(), txtProvince.getText(), txtZip.getText());
+        
+        try {
+            String resp = customerController.saveCustomer(customerDto);
+            JOptionPane.showMessageDialog(this, resp);
+            loadTable();
+            clearForm();
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
+    }
+
+    private void clearForm() {
+        txtId.setText("");
+        txtName.setText("");
+        txtTitle.setText("");
+        txtDob.setText("");
+        txtSalary.setText("");
+        txtAddress.setText("");
+        txtCity.setText("");
+        txtProvince.setText("");
+        txtZip.setText("");
+    }
+
+    private void searchCustomer() {
+        String customerId = (String) tblCustomer.getValueAt(tblCustomer.getSelectedRow(), 0);
+        try {
+            CustomerDto dto = customerController.searchCustomer(customerId);
+            if(dto != null){
+                txtId.setText(dto.getId());
+                txtTitle.setText(dto.getTitle());
+                txtName.setText(dto.getName());
+                txtDob.setText(dto.getDob());
+                txtSalary.setText(Double.toString(dto.getSalary()));
+                txtAddress.setText(dto.getAddress());
+                txtCity.setText(dto.getCity());
+                txtProvince.setText(dto.getProvince());
+                txtZip.setText(dto.getPostalCode());
+            } else {
+                JOptionPane.showMessageDialog(this, "Customer Not Found");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            JOptionPane.showMessageDialog(this, e.getMessage());
+        }
     }
 }
